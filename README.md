@@ -1,2 +1,2 @@
 # mouanga-chess-gui
->:(
+\>:(
