@@ -3,6 +3,7 @@
  * Author: Isak Larsson <isaklar@kth.se>
  * Last updated: 2022-09-29
  */
+
 extern crate glutin_window;
 extern crate graphics;
 extern crate opengl_graphics;
@@ -51,9 +52,9 @@ impl App {
                 Some((colour, PieceType::Bishop)),
                 Some((colour, PieceType::Queen)),
                 Some((colour, PieceType::King)),
-                Some((colour, PieceType::Rook)),
-                Some((colour, PieceType::Knight)),
                 Some((colour, PieceType::Bishop)),
+                Some((colour, PieceType::Knight)),
+                Some((colour, PieceType::Rook)),
             ]
         };
         let pawn_rank = |colour| [Some((colour, PieceType::Pawn)); 8];
@@ -92,16 +93,16 @@ impl App {
                         match col % 2 {
                             0 => {
                                 if row % 2 == 0 {
-                                    WHITE
-                                } else {
                                     BLACK
+                                } else {
+                                    WHITE
                                 }
                             }
                             _ => {
                                 if row % 2 == 0 {
-                                    BLACK
-                                } else {
                                     WHITE
+                                } else {
+                                    BLACK
                                 }
                             }
                         },
@@ -174,9 +175,12 @@ impl App {
     }
 }
 
+// fn 
+
 fn main() {
     // Change this to OpenGL::V2_1 if not working.
     let opengl = OpenGL::V3_2;
+    let mut move_in_progress: bool = false;
 
     // Create a Glutin window.
     let mut window: Window =
@@ -210,7 +214,11 @@ fn main() {
             app.mouse_pos = pos;
         }
         if let Some(Button::Mouse(MouseButton::Left)) = e.press_args() {
-            // Handle mouse press
+            // Moves are split into 2 parts:
+            // The "pick-up-the-piece" part, only doable when move_in_progress is false.
+            // The "place-down-the-piece" part, only doable when move_in_progress is true.
+            
+            move_in_progress = !move_in_progress;
         }
     }
 }
