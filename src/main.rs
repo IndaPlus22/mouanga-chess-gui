@@ -52,9 +52,9 @@ impl App {
                 Some((colour, PieceType::Bishop)),
                 Some((colour, PieceType::Queen)),
                 Some((colour, PieceType::King)),
-                Some((colour, PieceType::Bishop)),
-                Some((colour, PieceType::Knight)),
                 Some((colour, PieceType::Rook)),
+                Some((colour, PieceType::Knight)),
+                Some((colour, PieceType::Bishop)),
             ]
         };
         let pawn_rank = |colour| [Some((colour, PieceType::Pawn)); 8];
@@ -93,16 +93,16 @@ impl App {
                         match col % 2 {
                             0 => {
                                 if row % 2 == 0 {
-                                    BLACK
-                                } else {
                                     WHITE
+                                } else {
+                                    BLACK
                                 }
                             }
                             _ => {
                                 if row % 2 == 0 {
-                                    WHITE
-                                } else {
                                     BLACK
+                                } else {
+                                    WHITE
                                 }
                             }
                         },
@@ -133,7 +133,7 @@ impl App {
             // Draw text
             // We do some calculations to center the text
             // Is not exactly in the middle, try to fix it if you want to!
-            let state_text = format!("The game is {:?}", self.game.get_game_state());
+            let state_text = format!("{:?} | {:?}", self.game.get_game_state(), self.game.get_active_colour());
             let text_size: (f32, f32) = ((24 * state_text.len()) as f32, 24f32);
             let text_postition = c.transform.trans(
                 ((SCREEN_SIZE.0 - text_size.0) / 2f32) as f64,
@@ -175,12 +175,11 @@ impl App {
     }
 }
 
-// fn 
-
 fn main() {
     // Change this to OpenGL::V2_1 if not working.
     let opengl = OpenGL::V3_2;
-    let mut move_in_progress: bool = false;
+    let mut move_in_progress = false;
+    let mut game = chess_template::Game::new();
 
     // Create a Glutin window.
     let mut window: Window =
