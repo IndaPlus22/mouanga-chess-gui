@@ -275,7 +275,7 @@ fn main() {
             }
             else {
                 match game.make_move(&start_square, &coords_to_square(mouse_x, mouse_y)) {
-                    Ok(_) => println!("OK: {}-{}", &start_square, &coords_to_square(mouse_x,mouse_y),
+                    Ok(_) => println!("OK: {}-{}", &start_square, &coords_to_square(mouse_x,mouse_y)),
                     Err(message) => println!("Error: \"{}\" at attempted move `{}-{}`", message, &start_square, &coords_to_square(mouse_x, mouse_y)),
                     _ => println!("Oops!"),
                 }
