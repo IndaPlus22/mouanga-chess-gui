@@ -136,7 +136,7 @@ impl App {
             // Draw text
             // We do some calculations to center the text
             // Is not exactly in the middle, try to fix it if you want to!
-            let state_text = format!("{:?} | {:?}", self.game.get_game_state(), self.game.get_active_colour());
+            let state_text = format!(""/*"{:?} | {:?}", self.game.get_game_state(), self.game.get_active_colour()*/);
             let text_size: (f32, f32) = ((24 * state_text.len()) as f32, 24f32);
             let text_postition = c.transform.trans(
                 ((SCREEN_SIZE.0 - text_size.0) / 2f32) as f64,
