@@ -1,7 +1,7 @@
 /**
- * Chess GUI template.
- * Author: Isak Larsson <isaklar@kth.se>
- * Last updated: 2022-09-29
+ * Chess GUI.
+ * Author: Anders Mouanga <mouanga@kth.se>
+ * Based on Chess GUI Template from Isak Larsson <isaklar@kth.se>.
  */
 
 extern crate glutin_window;
