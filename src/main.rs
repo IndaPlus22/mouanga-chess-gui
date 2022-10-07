@@ -52,9 +52,9 @@ impl App {
                 Some((colour, PieceType::Bishop)),
                 Some((colour, PieceType::Queen)),
                 Some((colour, PieceType::King)),
-                Some((colour, PieceType::Rook)),
-                Some((colour, PieceType::Knight)),
                 Some((colour, PieceType::Bishop)),
+                Some((colour, PieceType::Knight)),
+                Some((colour, PieceType::Rook)),
             ]
         };
         let pawn_rank = |colour| [Some((colour, PieceType::Pawn)); 8];
@@ -93,16 +93,16 @@ impl App {
                         match col % 2 {
                             0 => {
                                 if row % 2 == 0 {
-                                    WHITE
-                                } else {
                                     BLACK
+                                } else {
+                                    WHITE
                                 }
                             }
                             _ => {
                                 if row % 2 == 0 {
-                                    BLACK
-                                } else {
                                     WHITE
+                                } else {
+                                    BLACK
                                 }
                             }
                         },
@@ -175,6 +175,42 @@ impl App {
     }
 }
 
+fn coords_to_square(x: f64, y: f64) -> String {
+    let new_x: i16 = x as i16;
+    let new_y: i16 = y as i16;
+    let mut square_result = "".to_string();
+    if new_x / (GRID_CELL_SIZE.0 as i16) == 0 {
+        square_result.push('a')
+    } else if new_x / (GRID_CELL_SIZE.0) as i16 == 1 {
+        square_result.push('b')
+    } else if new_x / (GRID_CELL_SIZE.0) as i16 == 2 {
+        square_result.push('c')
+    } else if new_x / (GRID_CELL_SIZE.0) as i16 == 3 {
+        square_result.push('d')
+    } else if new_x / (GRID_CELL_SIZE.0) as i16 == 4 {
+        square_result.push('e')
+    } else if new_x / (GRID_CELL_SIZE.0) as i16 == 5 {
+        square_result.push('f')
+    } else if new_x / (GRID_CELL_SIZE.0) as i16 == 6 {
+        square_result.push('g')
+    } else if new_x / (GRID_CELL_SIZE.0) as i16 == 7 {
+        square_result.push('h')
+    }
+    square_result.push(match 7 - new_y / GRID_CELL_SIZE.0 {
+        0 => '1',
+        1 => '2',
+        2 => '3',
+        3 => '4',
+        4 => '5',
+        5 => '6',
+        6 => '7',
+        7 | 8 => '8',
+        _ => panic!("How is your y position equal to {y}?!"),
+    });
+    return square_result;
+
+    }
+
 fn main() {
     // Change this to OpenGL::V2_1 if not working.
     let opengl = OpenGL::V3_2;
@@ -202,6 +238,11 @@ fn main() {
 
     let mut events = Events::new(EventSettings::new());
     // Our "game loop". Will run until we exit the window
+    let mut mouse_x: f64 = 0.0;
+    let mut mouse_y: f64 = 0.0;
+    let mut start_square: String = "a0".to_string();
+
+
     while let Some(e) = events.next(&mut window) {
         if let Some(args) = e.render_args() {
             app.render(&args, &mut glyphs);
@@ -209,15 +250,38 @@ fn main() {
         if let Some(args) = e.update_args() {
             app.update(&args);
         }
-        if let Some(pos) = e.mouse_cursor_args() {
-            app.mouse_pos = pos;
+        if let Some(pos) = e.mouse_cursor_args() { // The following code is most definitely horribly inefficient but this is easier for me to read :)
+            mouse_x = pos[0];
+            mouse_y = pos[1];
+
         }
         if let Some(Button::Mouse(MouseButton::Left)) = e.press_args() {
             // Moves are split into 2 parts:
             // The "pick-up-the-piece" part, only doable when move_in_progress is false.
             // The "place-down-the-piece" part, only doable when move_in_progress is true.
-            
-            move_in_progress = !move_in_progress;
+            println!("Mouse coords are: ({}, {})", mouse_x, mouse_y);
+            println!("You clicked on the square: {}", coords_to_square(mouse_x, mouse_y));
+       //     println!("Move in progress is equal to: {move_in_progress}");
+       //     println!("The board is equal to: {:?}", game.get_board());
+
+            if move_in_progress == false  {
+            start_square = coords_to_square(mouse_x, mouse_y);
+            println!("Moving from {}...", start_square);     
+            move_in_progress = true;
+            }
+            else {
+                match game.make_move(&start_square, &coords_to_square(mouse_x, mouse_y)) {
+                    Ok(_) => println!("Great job!"),
+                    Err(message) => println!("Error: \"{}\" at attempted move `{}-{}`", message, &start_square, &coords_to_square(mouse_x, mouse_y)),
+                    _ => println!("Oops!"),
+                }
+                move_in_progress = false;
+            }
+        }
+
+        if let Some(Button::Mouse(MouseButton::Right)) = e.press_args() {
+            app = App::new(opengl);
+            game = chess_template::Game::new();
         }
     }
 }
