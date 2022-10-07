@@ -117,7 +117,7 @@ impl App {
                     // draw piece
                     if let Some(piece) = self.game.get_board()[63 - chess_template::Position::new(row.try_into().unwrap(), col.try_into().unwrap()).unwrap().idx] /* This ilne inspired by the library author's implementation of Position struct in his own main.rs file */ {
                         let img = Image::new().rect(square);
-						println!("Drawing{:?} at square {}", piece, 63 - chess_template::Position::new(row.try_into().unwrap(), col.try_into().unwrap()).unwrap().idx);
+					//	println!("Drawing{:?} at square {}", piece, 63 - chess_template::Position::new(row.try_into().unwrap(), col.try_into().unwrap()).unwrap().idx);
                         img.draw(
                             self.sprites.get(&(piece.colour, piece.piece_type)).unwrap(),
                             &c.draw_state,
@@ -262,11 +262,11 @@ fn main() {
             // Moves are split into 2 parts:
             // The "pick-up-the-piece" part, only doable when move_in_progress is false.
             // The "place-down-the-piece" part, only doable when move_in_progress is true.
-            println!("Mouse coords are: ({}, {})", mouse_x, mouse_y);
-            println!("You clicked on the square: {}", coords_to_square(mouse_x, mouse_y));
-       //     println!("Move in progress is equal to: {move_in_progress}");
-            println!("The board is equal to: {:?}", game.get_board());
-			println!("The piece at the clicked position is: {:?}", chess_template::Position::parse_str(&coords_to_square(mouse_x, mouse_y)));
+          ///////  println!("Mouse coords are: ({}, {})", mouse_x, mouse_y);
+          ///////  println!("You clicked on the square: {}", coords_to_square(mouse_x, mouse_y));
+		  ///////  println!("Move in progress is equal to: {move_in_progress}");
+          //  println!("The board is equal to: {:?}", game.get_board());
+			// println!("The piece at the clicked position is: {:?}", chess_template::Position::parse_str(&coords_to_square(mouse_x, mouse_y)));
 
             if move_in_progress == false  {
             start_square = coords_to_square(mouse_x, mouse_y);
