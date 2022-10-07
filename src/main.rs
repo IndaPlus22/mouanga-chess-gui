@@ -18,7 +18,7 @@ use opengl_graphics::{GlGraphics, GlyphCache, OpenGL, Texture, TextureSettings};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::{RenderArgs, RenderEvent, UpdateArgs, UpdateEvent};
 use piston::window::WindowSettings;
-use piston::{Button, MouseButton, MouseCursorEvent, PressEvent};
+use piston::{Button, MouseButton, MouseCursorEvent, PressEvent, Key};
 
 /// A chess board is 8x8 tiles.
 const GRID_SIZE: i16 = 8;
@@ -49,7 +49,7 @@ impl App {
             [
                 Some((colour, PieceType::Rook)),
                 Some((colour, PieceType::Knight)),
-                Some((colour, PieceType::Bishop)),
+                Some((colour, PieceType::Knight)), // Should be bishop but this part is not even used
                 Some((colour, PieceType::Queen)),
                 Some((colour, PieceType::King)),
                 Some((colour, PieceType::Bishop)),
@@ -73,7 +73,7 @@ impl App {
                 pawn_rank(Colour::White),
                 royal_rank(Colour::White),
             ],
-            game: Game::new(),
+            game: chess_template::Game::new(),
             sprites: Self::load_sprites(),
         }
     }
@@ -115,10 +115,11 @@ impl App {
                     );
 
                     // draw piece
-                    if let Some(piece) = self.board[row as usize][col as usize] {
+                    if let Some(piece) = self.game.get_board()[63 - chess_template::Position::new(row.try_into().unwrap(), col.try_into().unwrap()).unwrap().idx] /* This ilne inspired by the library author's implementation of Position struct in his own main.rs file */ {
                         let img = Image::new().rect(square);
+						println!("Drawing{:?} at square {}", piece, 63 - chess_template::Position::new(row.try_into().unwrap(), col.try_into().unwrap()).unwrap().idx);
                         img.draw(
-                            self.sprites.get(&piece).unwrap(),
+                            self.sprites.get(&(piece.colour, piece.piece_type)).unwrap(),
                             &c.draw_state,
                             c.transform.trans(
                                 (col * GRID_CELL_SIZE.0) as f64,
@@ -126,8 +127,10 @@ impl App {
                             ),
                             gl,
                         )
+					
                     }
                 }
+				
             }
 
             // Draw text
@@ -262,7 +265,8 @@ fn main() {
             println!("Mouse coords are: ({}, {})", mouse_x, mouse_y);
             println!("You clicked on the square: {}", coords_to_square(mouse_x, mouse_y));
        //     println!("Move in progress is equal to: {move_in_progress}");
-       //     println!("The board is equal to: {:?}", game.get_board());
+            println!("The board is equal to: {:?}", game.get_board());
+			println!("The piece at the clicked position is: {:?}", chess_template::Position::parse_str(&coords_to_square(mouse_x, mouse_y)));
 
             if move_in_progress == false  {
             start_square = coords_to_square(mouse_x, mouse_y);
@@ -271,7 +275,7 @@ fn main() {
             }
             else {
                 match game.make_move(&start_square, &coords_to_square(mouse_x, mouse_y)) {
-                    Ok(_) => println!("Great job!"),
+                    Ok(_) => println!("OK: {}-{}", &start_square, &coords_to_square(mouse_x,mouse_y),
                     Err(message) => println!("Error: \"{}\" at attempted move `{}-{}`", message, &start_square, &coords_to_square(mouse_x, mouse_y)),
                     _ => println!("Oops!"),
                 }
@@ -283,5 +287,29 @@ fn main() {
             app = App::new(opengl);
             game = chess_template::Game::new();
         }
+		
+		if let Some(Button::Keyboard(Key::Left)) = e.press_args() {
+			if game.get_game_state() == chess_template::GameState::WaitingOnPromotionChoice { 
+				game.set_promotion("queen".to_string());
+			}
+		}
+		
+		if let Some(Button::Keyboard(Key::Up)) = e.press_args() {
+			if game.get_game_state() == chess_template::GameState::WaitingOnPromotionChoice { 
+				game.set_promotion("rook".to_string());
+			}
+		}
+		
+		if let Some(Button::Keyboard(Key::Right)) = e.press_args() {
+			if game.get_game_state() == chess_template::GameState::WaitingOnPromotionChoice { 
+				game.set_promotion("bishop".to_string());
+			}
+		}
+		
+		if let Some(Button::Keyboard(Key::Down)) = e.press_args() {
+			if game.get_game_state() == chess_template::GameState::WaitingOnPromotionChoice { 
+				game.set_promotion("knight".to_string());
+			}
+		}
     }
 }
