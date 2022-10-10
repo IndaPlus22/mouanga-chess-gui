@@ -1,9 +1,9 @@
 # mouanga-chess-gui
-it's like chess but the pieces are invisible lmao (totally intentional!)
+
+it's like chess but you can't castle or en passant!
+
 (you can check the terminal to see if you made a legal move)
+
 (you can right click to restart the game!)
-(when promoting:)
-	left key 	=> queen
-	up key   	=> rook
-	right key	=> bishop
-	down key	=> knight
+
+(promotions are "random" but you get an extra move!)
