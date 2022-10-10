@@ -40,7 +40,7 @@ pub struct App {
     mouse_pos: [f64; 2],                            // Current mouse postition
     sprites: HashMap<(Colour, PieceType), Texture>, // For easy access to the apropriate PNGs
     board: [[Option<(Colour, PieceType)>; 8]; 8], // Or whatever way you prefer to represent the board (hint: might not be neccesary)
-    game: Game, // Save piece positions, which tiles has been clicked, current colour, etc...
+    pub game: Game, // Save piece positions, which tiles has been clicked, current colour, etc...
 }
 
 impl App {
@@ -182,21 +182,21 @@ fn coords_to_square(x: f64, y: f64) -> String {
     let new_x: i16 = x as i16;
     let new_y: i16 = y as i16;
     let mut square_result = "".to_string();
-    if new_x / (GRID_CELL_SIZE.0 as i16) == 0 {
+    if new_x / (GRID_CELL_SIZE.0 as i16) == 7 {
         square_result.push('a')
-    } else if new_x / (GRID_CELL_SIZE.0) as i16 == 1 {
-        square_result.push('b')
-    } else if new_x / (GRID_CELL_SIZE.0) as i16 == 2 {
-        square_result.push('c')
-    } else if new_x / (GRID_CELL_SIZE.0) as i16 == 3 {
-        square_result.push('d')
-    } else if new_x / (GRID_CELL_SIZE.0) as i16 == 4 {
-        square_result.push('e')
-    } else if new_x / (GRID_CELL_SIZE.0) as i16 == 5 {
-        square_result.push('f')
     } else if new_x / (GRID_CELL_SIZE.0) as i16 == 6 {
+        square_result.push('b')
+    } else if new_x / (GRID_CELL_SIZE.0) as i16 == 5 {
+        square_result.push('c')
+    } else if new_x / (GRID_CELL_SIZE.0) as i16 == 4 {
+        square_result.push('d')
+    } else if new_x / (GRID_CELL_SIZE.0) as i16 == 3 {
+        square_result.push('e')
+    } else if new_x / (GRID_CELL_SIZE.0) as i16 == 2 {
+        square_result.push('f')
+    } else if new_x / (GRID_CELL_SIZE.0) as i16 == 1 {
         square_result.push('g')
-    } else if new_x / (GRID_CELL_SIZE.0) as i16 == 7 {
+    } else if new_x / (GRID_CELL_SIZE.0) as i16 == 0 {
         square_result.push('h')
     }
     square_result.push(match 7 - new_y / GRID_CELL_SIZE.0 {
@@ -274,7 +274,7 @@ fn main() {
             move_in_progress = true;
             }
             else {
-                match game.make_move(&start_square, &coords_to_square(mouse_x, mouse_y)) {
+                match app.game.make_move(&start_square, &coords_to_square(mouse_x, mouse_y)) {
                     Ok(_) => println!("OK: {}-{}", &start_square, &coords_to_square(mouse_x,mouse_y)),
                     Err(message) => println!("Error: \"{}\" at attempted move `{}-{}`", message, &start_square, &coords_to_square(mouse_x, mouse_y)),
                     _ => println!("Oops!"),
