@@ -3,7 +3,6 @@
  * Author: Anders Mouanga <mouanga@kth.se>
  * Based on Chess GUI Template from Isak Larsson <isaklar@kth.se>.
  */
-
 extern crate glutin_window;
 extern crate graphics;
 extern crate opengl_graphics;
@@ -18,7 +17,7 @@ use opengl_graphics::{GlGraphics, GlyphCache, OpenGL, Texture, TextureSettings};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::{RenderArgs, RenderEvent, UpdateArgs, UpdateEvent};
 use piston::window::WindowSettings;
-use piston::{Button, MouseButton, MouseCursorEvent, PressEvent, Key};
+use piston::{Button, Key, MouseButton, MouseCursorEvent, PressEvent};
 
 /// A chess board is 8x8 tiles.
 const GRID_SIZE: i16 = 8;
@@ -117,7 +116,6 @@ impl App {
                     // draw piece
                     if let Some(piece) = self.game.get_board()[63 - chess_template::Position::new(row.try_into().unwrap(), col.try_into().unwrap()).unwrap().idx] /* This ilne inspired by the library author's implementation of Position struct in his own main.rs file */ {
                         let img = Image::new().rect(square);
-					//	println!("Drawing{:?} at square {}", piece, 63 - chess_template::Position::new(row.try_into().unwrap(), col.try_into().unwrap()).unwrap().idx);
                         img.draw(
                             self.sprites.get(&(piece.colour, piece.piece_type)).unwrap(),
                             &c.draw_state,
@@ -182,7 +180,8 @@ fn coords_to_square(x: f64, y: f64) -> String {
     let new_x: i16 = x as i16;
     let new_y: i16 = y as i16;
     let mut square_result = "".to_string();
-    if new_x / (GRID_CELL_SIZE.0 as i16) == 7 { // The board is mirrored from the start, thus we need to un-mirror it here. That's why the coords go from h-a in the console
+    if new_x / (GRID_CELL_SIZE.0 as i16) == 7 {
+        // The board is mirrored from the start, thus we need to un-mirror it here. That's why the coords go from h-a in the console
         square_result.push('a')
     } else if new_x / (GRID_CELL_SIZE.0) as i16 == 6 {
         square_result.push('b')
@@ -211,8 +210,7 @@ fn coords_to_square(x: f64, y: f64) -> String {
         _ => panic!("How is your y position equal to {y}?!"),
     });
     return square_result;
-
-    }
+}
 
 fn main() {
     // Change this to OpenGL::V2_1 if not working.
@@ -246,7 +244,6 @@ fn main() {
     let mut start_square: String = "a0".to_string();
     let mut random_promotion: u8 = 0; // "random"
 
-
     while let Some(e) = events.next(&mut window) {
         if let Some(args) = e.render_args() {
             app.render(&args, &mut glyphs);
@@ -254,32 +251,38 @@ fn main() {
         if let Some(args) = e.update_args() {
             app.update(&args);
         }
-        if let Some(pos) = e.mouse_cursor_args() { // The following code is most definitely horribly inefficient but this is easier for me to read :)
+        if let Some(pos) = e.mouse_cursor_args() {
+            // The following code is most definitely horribly inefficient but this is easier for me to read :)
             mouse_x = pos[0];
             mouse_y = pos[1];
             random_promotion += 1;
             random_promotion = random_promotion % 4;
-
         }
         if let Some(Button::Mouse(MouseButton::Left)) = e.press_args() {
             // Moves are split into 2 parts:
             // The "pick-up-the-piece" part, only doable when move_in_progress is false.
             // The "place-down-the-piece" part, only doable when move_in_progress is true.
-          ///////  println!("Mouse coords are: ({}, {})", mouse_x, mouse_y);
-          ///////  println!("You clicked on the square: {}", coords_to_square(mouse_x, mouse_y));
-		  ///////  println!("Move in progress is equal to: {move_in_progress}");
-          //  println!("The board is equal to: {:?}", game.get_board());
-			// println!("The piece at the clicked position is: {:?}", chess_template::Position::parse_str(&coords_to_square(mouse_x, mouse_y)));
 
-            if move_in_progress == false  {
-            start_square = coords_to_square(mouse_x, mouse_y);
-            println!("Moving from {}...", start_square);     
-            move_in_progress = true;
-            }
-            else {
-                match app.game.make_move(&start_square, &coords_to_square(mouse_x, mouse_y)) {
-                    Ok(_) => println!("OK: {}-{}", &start_square, &coords_to_square(mouse_x,mouse_y)),
-                    Err(message) => println!("Error: \"{}\" at attempted move `{}-{}`", message, &start_square, &coords_to_square(mouse_x, mouse_y)),
+            if move_in_progress == false {
+                start_square = coords_to_square(mouse_x, mouse_y);
+                println!("Moving from {}...", start_square);
+                move_in_progress = true;
+            } else {
+                match app
+                    .game
+                    .make_move(&start_square, &coords_to_square(mouse_x, mouse_y))
+                {
+                    Ok(_) => println!(
+                        "OK: {}-{}",
+                        &start_square,
+                        &coords_to_square(mouse_x, mouse_y)
+                    ),
+                    Err(message) => println!(
+                        "Error: \"{}\" at attempted move `{}-{}`",
+                        message,
+                        &start_square,
+                        &coords_to_square(mouse_x, mouse_y)
+                    ),
                     _ => println!("Oops!"),
                 }
                 move_in_progress = false;
@@ -292,9 +295,7 @@ fn main() {
                     2 => "bishop".to_string(),
                     3 => "rook".to_string(),
                     _ => "bro?".to_string(),
-                }
-                );
-                
+                });
             }
         }
 
@@ -304,32 +305,31 @@ fn main() {
             move_in_progress = false;
         }
 
-        
-		/* 
-		if let Some(Button::Keyboard(Key::D1)) = e.press_args() {
-			if game.get_game_state() == chess_template::GameState::WaitingOnPromotionChoice { 
-				game.set_promotion("queen".to_string());
-			}
-		}
-		
-		if let Some(Button::Keyboard(Key::D2)) = e.press_args() {
-			if game.get_game_state() == chess_template::GameState::WaitingOnPromotionChoice { 
-				game.set_promotion("rook".to_string());
+        /*
+        if let Some(Button::Keyboard(Key::D1)) = e.press_args() {
+            if game.get_game_state() == chess_template::GameState::WaitingOnPromotionChoice {
+                game.set_promotion("queen".to_string());
+            }
+        }
+
+        if let Some(Button::Keyboard(Key::D2)) = e.press_args() {
+            if game.get_game_state() == chess_template::GameState::WaitingOnPromotionChoice {
+                game.set_promotion("rook".to_string());
                 println!("Promoted to a rook, or should I say: {:?}", "rook".to_string());
-			}
-		}
-		
-		if let Some(Button::Keyboard(Key::D3)) = e.press_args() {
-			if game.get_game_state() == chess_template::GameState::WaitingOnPromotionChoice { 
-				game.set_promotion("bishop".to_string());
-			}
-		}
-		
-		if let Some(Button::Keyboard(Key::D4)) = e.press_args() {
-			if game.get_game_state() == chess_template::GameState::WaitingOnPromotionChoice { 
-				game.set_promotion("knight".to_string());
-			}
-		}
+            }
+        }
+
+        if let Some(Button::Keyboard(Key::D3)) = e.press_args() {
+            if game.get_game_state() == chess_template::GameState::WaitingOnPromotionChoice {
+                game.set_promotion("bishop".to_string());
+            }
+        }
+
+        if let Some(Button::Keyboard(Key::D4)) = e.press_args() {
+            if game.get_game_state() == chess_template::GameState::WaitingOnPromotionChoice {
+                game.set_promotion("knight".to_string());
+            }
+        }
         */
     }
 }
