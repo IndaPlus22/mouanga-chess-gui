@@ -182,7 +182,7 @@ fn coords_to_square(x: f64, y: f64) -> String {
     let new_x: i16 = x as i16;
     let new_y: i16 = y as i16;
     let mut square_result = "".to_string();
-    if new_x / (GRID_CELL_SIZE.0 as i16) == 7 {
+    if new_x / (GRID_CELL_SIZE.0 as i16) == 7 { // The board is mirrored from the start, thus we need to un-mirror it here. That's why the coords go from h-a in the console
         square_result.push('a')
     } else if new_x / (GRID_CELL_SIZE.0) as i16 == 6 {
         square_result.push('b')
@@ -244,6 +244,7 @@ fn main() {
     let mut mouse_x: f64 = 0.0;
     let mut mouse_y: f64 = 0.0;
     let mut start_square: String = "a0".to_string();
+    let mut random_promotion: u8 = 0; // "random"
 
 
     while let Some(e) = events.next(&mut window) {
@@ -256,6 +257,8 @@ fn main() {
         if let Some(pos) = e.mouse_cursor_args() { // The following code is most definitely horribly inefficient but this is easier for me to read :)
             mouse_x = pos[0];
             mouse_y = pos[1];
+            random_promotion += 1;
+            random_promotion = random_promotion % 4;
 
         }
         if let Some(Button::Mouse(MouseButton::Left)) = e.press_args() {
@@ -281,35 +284,52 @@ fn main() {
                 }
                 move_in_progress = false;
             }
+
+            if app.game.get_game_state() == chess_template::GameState::WaitingOnPromotionChoice {
+                app.game.set_promotion(match random_promotion {
+                    0 => "queen".to_string(),
+                    1 => "knight".to_string(),
+                    2 => "bishop".to_string(),
+                    3 => "rook".to_string(),
+                    _ => "bro?".to_string(),
+                }
+                );
+                
+            }
         }
 
         if let Some(Button::Mouse(MouseButton::Right)) = e.press_args() {
             app = App::new(opengl);
             game = chess_template::Game::new();
+            move_in_progress = false;
         }
-		
-		if let Some(Button::Keyboard(Key::Left)) = e.press_args() {
+
+        
+		/* 
+		if let Some(Button::Keyboard(Key::D1)) = e.press_args() {
 			if game.get_game_state() == chess_template::GameState::WaitingOnPromotionChoice { 
 				game.set_promotion("queen".to_string());
 			}
 		}
 		
-		if let Some(Button::Keyboard(Key::Up)) = e.press_args() {
+		if let Some(Button::Keyboard(Key::D2)) = e.press_args() {
 			if game.get_game_state() == chess_template::GameState::WaitingOnPromotionChoice { 
 				game.set_promotion("rook".to_string());
+                println!("Promoted to a rook, or should I say: {:?}", "rook".to_string());
 			}
 		}
 		
-		if let Some(Button::Keyboard(Key::Right)) = e.press_args() {
+		if let Some(Button::Keyboard(Key::D3)) = e.press_args() {
 			if game.get_game_state() == chess_template::GameState::WaitingOnPromotionChoice { 
 				game.set_promotion("bishop".to_string());
 			}
 		}
 		
-		if let Some(Button::Keyboard(Key::Down)) = e.press_args() {
+		if let Some(Button::Keyboard(Key::D4)) = e.press_args() {
 			if game.get_game_state() == chess_template::GameState::WaitingOnPromotionChoice { 
 				game.set_promotion("knight".to_string());
 			}
 		}
+        */
     }
 }
